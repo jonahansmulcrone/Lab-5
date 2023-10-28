@@ -18,19 +18,96 @@ import sys
 import argparse
 import math
 import os
+import re
 
 # You may need to define the Tree node and add extra helper functions here
 
-
-def DTtrain(data, model):
+def DTtrain(infile, model, percent):
     """
     This is the function for training a decision tree model
     """
     # implement your code here
+    
+    """
+    the first part of this method handles reading the trainingdata.txt file 
+    and creating the datamap, attvalues, and arr variables which are important for training the model
+    """
 
-    pass
+    try: 
+        """initialize map for storing data"""
+        datamap = {}
 
+        """open the trainingdata.txt file"""
+        with open(infile, 'r') as file:
+            line = file.readline()
+            attline = line[1:]
 
+            atts = attline.split('|')
+            atts = [att.strip() for att in atts]
+
+            numatts = len(atts)-1
+
+            """Initialize a map of atttribute values"""
+            attvalues = {}
+            for att in atts:
+                attvalues[att] = []
+
+            """Read data into map"""
+
+            index = 0
+
+            for line in file:
+                
+                cleaned_line = []
+                current_num = ''
+
+                """Iterate through the elements in the line"""
+                for element in line:
+                    
+                    if element.isdigit():
+                        current_num += element
+                        
+                    elif current_num:
+
+                        cleaned_line.append(current_num)
+                        current_num = ''
+
+                if current_num:
+                    cleaned_line.append(current_num)
+
+                dataclass = cleaned_line[0]
+
+                arr = attvalues[atts[0]]
+
+                if dataclass not in arr:
+                    arr.append(dataclass)
+                
+                if dataclass not in datamap:
+                    datamap[dataclass] = []
+
+                a = datamap.get(dataclass)
+                datapoint = []
+        
+                for i in range(1, numatts + 1):
+                    datapoint.append(cleaned_line[i])
+                    arr = attvalues.get(atts[i])
+
+                    if cleaned_line[i] not in arr:
+                        arr.append(cleaned_line[i])
+                
+                if index % 100 < percent:
+                    a.append(datapoint)
+            
+            numclasses = len(datamap.keys())
+            
+    except IOError as e:
+        print(f"Error reading file: {e}")
+        sys.exit(1)
+
+    """
+    end of reading file
+    """
+        
 
 def DTpredict(data, model, prediction):
     """
@@ -85,7 +162,7 @@ def main():
         outModel = options.output
         if inputFile == '' or outModel == '':
             showHelper()
-        DTtrain(inputFile, outModel)
+        DTtrain(inputFile, outModel, 100)
     elif mode == "P":
         """
         The prediction mode
@@ -95,7 +172,7 @@ def main():
         outPrediction = options.output
         if inputFile == '' or modelPath == '' or outPrediction == '':
             showHelper()
-        DTpredict(inputFile,modelPath,outPrediction)
+        DTpredict(inputFile, modelPath, outPrediction)
     elif mode == "E":
         """
         The evaluating mode

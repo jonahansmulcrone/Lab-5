@@ -63,6 +63,7 @@ public class DTTrain {
             }//while
 
             numClasses = datamap.keySet().size();
+
         }
         catch(IOException e) {
             System.out.println("Error reading file : " + e);
@@ -231,7 +232,7 @@ public class DTTrain {
             if(args.length == 3)
                 t.readFile(infile, Integer.parseInt(args[2]));
             else
-                t.readFile(infile,100);
+                t.readFile(infile, 100);
 
             t.buildTree();
 
