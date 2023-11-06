@@ -1,0 +1,7 @@
+To train the model using weka
+java -classpath .:/Users/stuartg/CS330/weka-3-8-6/weka.jar weka.classifiers.trees.J48 -t ARFFTrainingData.arff -c 1 -d weka_DT_model.model
+
+
+To make predictions using the model
+java -classpath .:/Users/stuartg/CS330/weka-3-8-6/weka.jar weka.classifiers.trees.J48 -T ARFFTestData.arff -l weka_DT_model.model -c 1 -p 1 > weka_predictions.txt
+

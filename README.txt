@@ -9,7 +9,13 @@ In order to get full points, each group member must make contributions. You coul
 Introduce the dataset for your project in discord and add comments on this lab! Each group member needs to post.
 
 (4). Performance comparison (4 points)
-Please try decision tree model in weka or other machine learning library and compare the performance of your implementation with those existing library. The EvaDT function is already implemented in Lab4.py for evaluating the performance.
+We used weka's weka.classifiers.trees.J48 machine learning model to train and predict values in our dataset.
+
+To train the model using weka
+java -classpath .:/Users/stuartg/CS330/weka-3-8-6/weka.jar weka.classifiers.trees.J48 -t ARFFTrainingData.arff -c 1 -d weka_DT_model.model
+
+To make predictions using the model
+java -classpath .:/Users/stuartg/CS330/weka-3-8-6/weka.jar weka.classifiers.trees.J48 -T ARFFTestData.arff -l weka_DT_model.model -c 1 -p 1 > weka_predictions.txt
 
 (5). Bonus points (up to 2 points)
 Each group could earn bonus points for doing additional work. For example, different entropy for decision and add an option to choose it.
