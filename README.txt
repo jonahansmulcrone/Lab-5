@@ -18,4 +18,4 @@ To make predictions using the model
 java -classpath .:/Users/stuartg/CS330/weka-3-8-6/weka.jar weka.classifiers.trees.J48 -T ARFFTestData.arff -l weka_DT_model.model -c 1 -p 1 > weka_predictions.txt
 
 (5). Bonus points (up to 2 points)
-Each group could earn bonus points for doing additional work. For example, different entropy for decision and add an option to choose it.
+We added another entropy calculation called Gini impurity. To train a model with this entropy calculation, you can use the argument --entropy with a value of option2

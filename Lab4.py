@@ -9,7 +9,8 @@
 
  Known Bugs: description of known bugs and other program imperfections
 
- Creativity: anything extra that you added to the lab
+ Creativity: We added another entropy calculation called Gini impurity. To train a 
+ model with this entropy calculation, you can use the argument --entropy with a value of option2
 
  Instructions: After a lot of practice in Python, in this lab, you are going to design the program for decision tree
  and implement it from scratch! Don't be panic, you still have some reference, actually you are going to translate the
@@ -37,8 +38,9 @@ class DTTrain:
         self.numAtts = 0  # The number of attributes used to predict atts[0]
         self.numClasses = 0  # The total number of classes to predict between
         self.root = None
+        self.entropy_method = "default"
 
-    def read_file(self, infile, percent):
+    def read_file(self, infile, percent, entropy_option):
         """
             the first part of this method handles reading the trainingdata.txt file
             and creating the datamap, attvalues, and arr variables which are important for training the model
@@ -46,6 +48,7 @@ class DTTrain:
         try:
             """initialize map for storing data"""
             self.datamap = {}
+            self.entropy_method = entropy_option
 
             """open the trainingdata.txt file"""
             with open(infile, 'r') as file:
@@ -181,10 +184,12 @@ class DTTrain:
         total_ent = 0
         total = 0
 
+        entropy_function = self.entropy if self.entropy_method == 'default' else self.entropy_2
+
         for i in range(len(partition)):
             n = sum(partition[i])
             total += sum(partition[i])
-            total_ent += n * self.entropy(partition[i])
+            total_ent += n * entropy_function(partition[i])
 
         return total_ent / total
 
@@ -198,6 +203,19 @@ class DTTrain:
                 entropy_sum -= (i / total) * DTTrain.log2(i / total)
 
         return entropy_sum
+    
+    @staticmethod
+    def entropy_2(class_counts):
+        total = sum(class_counts)
+        if total == 0: 
+            return 0
+        impurity_sum = 0
+
+        for count in class_counts:
+            prob_of_lbl = count / total
+            impurity_sum += prob_of_lbl * (1 - prob_of_lbl)
+
+        return impurity_sum
 
     @staticmethod
     def log2(x):
@@ -229,12 +247,12 @@ class DTTrain:
         outfile.write(" ) ")
 
 
-def DTtrain(infile, model, percent):
+def DTtrain(infile, model, percent, entropy_option):
     """
     This is the function for training a decision tree model
     """
     t = DTTrain()
-    t.read_file(infile, percent)
+    t.read_file(infile, percent, entropy_option)
     t.build_tree()
     t.save_model(model)
 
@@ -286,6 +304,7 @@ def main():
     inputFile = "TrainingData.txt"
     outModel = "DTModel.txt"
     mode = "T"  # first get the mode
+    entropy_option = options.entropy
     print("mode is " + mode)
     if mode == "T":
         """
@@ -295,7 +314,7 @@ def main():
         # outModel = options.output
         if inputFile == '' or outModel == '':
             showHelper()
-        DTtrain(inputFile, outModel, 100)
+        DTtrain(inputFile, outModel, 100, entropy_option)
     elif mode == "P":
         """
         The prediction mode
@@ -354,6 +373,9 @@ if __name__ == "__main__":
     parser.add_argument('--trueLabel', dest='trueLabel',
                         default='',  # default empty!
                         help='The path of the correct label ')
+    parser.add_argument('--entropy', dest='entropy',
+                        default='default',
+                        help="There are two entropy methods. The 'default' and 'option2'")
     # if len(sys.argv) < 3:
     #     showHelper()
     main()
