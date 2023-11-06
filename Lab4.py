@@ -29,7 +29,6 @@ class TreeNode:
         self.attribute = "none"
         self.return_val = None
 
-
 class DTTrain:
     def __init__(self):
         self.datamap = {}  # Stores all data read in
@@ -257,6 +256,106 @@ def DTtrain(infile, model, percent, entropy_option):
     t.save_model(model)
 
 
+class TreeNode:
+    def __init__(self, attribute, children, return_val):
+        self.attribute = attribute
+        self.children = children
+        self.return_val = return_val
+
+
+class DTPredict:
+    def __init__(self):
+        self.root = None
+        self.att_arr = None
+        self.predictions = []
+
+    def read_model(self, infile):
+
+        try:
+            with open(infile, 'r') as file:
+                atts = file.readline().split()
+
+                self.att_arr = []
+
+                for i in range(len(atts)):
+                    self.att_arr.append(atts[i])
+
+                self.root = self.read_node(file)
+
+        except IOError as e:
+            print('Error reading file: ' + e)
+            sys.exit(1)
+
+    def read_node(self, file):
+
+        line = file.readline().strip()
+        
+        if not line:
+            return None 
+
+        tree = line.split()
+        n = tree[0][0]
+
+        if n == "[":
+            return TreeNode(None, None, tree[1][:-1])
+
+        node = TreeNode(n, {}, None)
+
+        i = 1
+        while i < len(tree):
+            val = tree[i]
+
+            print("this is a val", val)
+            
+            if val == ")":
+                return node
+
+            node.children[val] = self.read_node(file)
+            i += 1
+
+        return node
+
+    def predict_from_model(self, testfile):
+
+        try:
+            self.predictions = []
+            with open(testfile, 'r') as file:
+                for line in file:
+
+                    data = line.strip().split()
+
+                    if data:
+                        data.pop(0)
+                        print(self.root)
+                        pred = self.trace_tree(self.root, data)
+                        self.predictions.append(pred)
+
+        except IOError as e:
+            print(f"Error reading test file: {e}")
+            sys.exit(1)
+
+    def trace_tree(self, node, data):
+
+        if node.return_val is not None:
+            return node.return_val
+        
+        att = node.attribute
+        val = data[self.att_arr.index(att)]
+        t = node.children.get(val)
+
+        return self.trace_tree(t, data)
+
+
+    def save_predictions(self, outputfile):
+
+        try:
+            with open(outputfile, 'w') as file:
+                for prediction in self.predictions:
+                    file.write(f"{prediction}\n")
+
+        except IOError as e:
+            print(f"Error writing to file: {e}")
+
 def DTpredict(data, model, prediction):
     """
     This is the main function to make predictions on the test dataset. It will load saved model file,
@@ -269,8 +368,11 @@ def DTpredict(data, model, prediction):
     ...
     """
     # implement your code here
-
-    pass
+    
+    p = DTPredict()
+    p.read_model(model)
+    p.predict_from_model(data)
+    p.save_predictions(prediction)
 
 
 def EvaDT(predictionLabel, realLabel, output):
@@ -303,8 +405,12 @@ def main():
     options = parser.parse_args()
     inputFile = "TrainingData.txt"
     outModel = "DTModel.txt"
+<<<<<<< HEAD
     mode = "T"  # first get the mode
     entropy_option = options.entropy
+=======
+    mode = "P"  # first get the mode
+>>>>>>> 632a53f (DTPredict Implementation)
     print("mode is " + mode)
     if mode == "T":
         """
@@ -342,10 +448,8 @@ def showHelper():
     parser.print_help(sys.stderr)
     print("Please provide input argument. Here are examples:")
     print("python " + sys.argv[0] + " --mode T --input TrainingData.txt --output DTModel.txt")
-    print("python " + sys.argv[
-        0] + " --mode P --input TestDataNoLabel.txt --modelPath DTModel.txt --output TestDataLabelPrediction.txt")
-    print("python " + sys.argv[
-        0] + " --mode E --input TestDataLabelPrediction.txt --trueLabel LabelForTest.txt --output Performance.txt")
+    print("python " + sys.argv[0] + " --mode P --input TestDataNoLabel.txt --modelPath DTModel.txt --output TestDataLabelPrediction.txt")
+    print("python " + sys.argv[0] + " --mode E --input TestDataLabelPrediction.txt --trueLabel LabelForTest.txt --output Performance.txt")
     sys.exit(0)
 
 
