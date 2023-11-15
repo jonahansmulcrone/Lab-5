@@ -29,7 +29,6 @@ class TreeNode:
         self.attribute = "none"
         self.return_val = None
 
-
 class DTTrain:
     def __init__(self):
         self.datamap = {}  # Stores all data read in
@@ -257,6 +256,122 @@ def DTtrain(infile, model, percent, entropy_option):
     t.save_model(model)
 
 
+class TreeNodeP:
+    def __init__(self, attribute, children, return_val):
+        self.attribute = attribute
+        self.children = children
+        self.return_val = return_val
+
+
+class DTPredict:
+    def __init__(self):
+        self.root = None
+        self.att_arr = None
+        self.predictions = []
+
+    def read_model(self, infile):
+
+        print("PREDICTION METHOD REACHED")
+        print(infile)
+
+        try:
+            with open(infile, 'r') as file:
+                atts = file.readline().split()
+
+                self.att_arr = []
+
+                for i in range(len(atts)):
+                    self.att_arr.append(atts[i])
+
+                self.root = self.read_node(file)
+
+        except IOError as e:
+            print('Error reading file: ', e)
+            sys.exit(1)
+
+    def read_node(self, file):
+        n_generator = self.read_next_word(file)
+        n = next(n_generator)
+        print("VALUE OF N: ", n)
+
+        if n[0] == '[':
+            return TreeNodeP(None, None, n[1:-1])
+        
+        node = TreeNodeP(n, {}, None)
+        next(n_generator)
+        
+        val = next(n_generator)
+        print("VAL BEFORE WHILE: ", val)
+
+        while val != ')':
+            print("VAL IN WHILE LOOP: ", val)
+            node.children[val] = self.read_node(file)
+            val = next(n_generator)
+
+        return node
+
+    def read_next_word(self, file):
+
+        word = ''
+        current_position = file.tell()
+
+        while True:
+            char = file.read(1)
+            # print("VALUE OF CHAR IN READ: ", char)
+            if not char:  # End of file
+                if word:
+                    yield word
+                break
+            if char.isspace():
+                if word:
+                    yield word
+                    word = ''
+            else:
+                word += char
+        
+        file.seek(current_position) 
+
+    def predict_from_model(self, testfile):
+
+        try:
+            self.predictions = []
+            with open(testfile, 'r') as file:
+                for line in file:
+
+                    data = line.strip().split()
+
+                    if data:
+                        data.pop(0)
+                        pred = self.trace_tree(self.root, data)
+                        self.predictions.append(pred)
+
+        except IOError as e:
+            print(f"Error reading test file: {e}")
+            sys.exit(1)
+            
+
+    def trace_tree(self, node, data):
+
+        if node.return_val is not None:
+            return node.return_val
+        
+        att = node.attribute
+        val = data[self.att_arr.index(att)]
+        t = node.children.get(val)
+
+        return self.trace_tree(t, data)
+
+
+    def save_predictions(self, outputfile):
+
+        try:
+            with open(outputfile, 'w') as file:
+                for prediction in self.predictions:
+                    file.write(f"{prediction}\n")
+
+        except IOError as e:
+            print(f"Error writing to file: {e}")
+
 def DTpredict(data, model, prediction):
     """
     This is the main function to make predictions on the test dataset. It will load saved model file,
@@ -269,8 +384,11 @@ def DTpredict(data, model, prediction):
     ...
     """
     # implement your code here
-
-    pass
+    
+    p = DTPredict()
+    p.read_model(model)
+    p.predict_from_model(data)
+    p.save_predictions(prediction)
 
 
 def EvaDT(predictionLabel, realLabel, output):
@@ -303,7 +421,7 @@ def main():
     options = parser.parse_args()
     inputFile = "TrainingData.txt"
     outModel = "DTModel.txt"
-    mode = "T"  # first get the mode
+    mode = "P"  # first get the mode
     entropy_option = options.entropy
     print("mode is " + mode)
     if mode == "T":
@@ -342,10 +460,8 @@ def showHelper():
     parser.print_help(sys.stderr)
     print("Please provide input argument. Here are examples:")
     print("python " + sys.argv[0] + " --mode T --input TrainingData.txt --output DTModel.txt")
-    print("python " + sys.argv[
-        0] + " --mode P --input TestDataNoLabel.txt --modelPath DTModel.txt --output TestDataLabelPrediction.txt")
-    print("python " + sys.argv[
-        0] + " --mode E --input TestDataLabelPrediction.txt --trueLabel LabelForTest.txt --output Performance.txt")
+    print("python " + sys.argv[0] + " --mode P --input TestDataNoLabel.txt --modelPath DTModel.txt --output TestDataLabelPrediction.txt")
+    print("python " + sys.argv[0] + " --mode E --input TestDataLabelPrediction.txt --trueLabel LabelForTest.txt --output Performance.txt")
     sys.exit(0)
 
 

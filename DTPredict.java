@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -27,6 +28,7 @@ public class DTPredict {
             for(int i = 0; i < atts.length; i++)
                 attArr.add(atts[i]);
             root = readNode(infile);
+
         }catch(IOException e) {
             System.out.println("Error reading model: " + e);
             System.exit(1);

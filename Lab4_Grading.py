@@ -104,12 +104,12 @@ NRecord = generateTest(N,F,TestingData)
 
 print("Testing standard dataset ... ")
 try:
-    os.system("python "+ ProgramName + " --mode T --input "+TrainingData+" --output "+ModelPath)
+    os.system("python3 "+ ProgramName + " --mode T --input "+TrainingData+" --output "+ModelPath)
 except:
     print("error when running "+ProgramName)
 
 try:
-    os.system("python "+ ProgramName + " --mode P --input "+TestingData+" --modelPath "+ModelPath + " --output " + PredictionData)
+    os.system("python3 "+ ProgramName + " --mode P --input "+TestingData+" --modelPath "+ModelPath + " --output " + PredictionData)
     if verify(PredictionData,NRecord):
         print("Great! Your DT Training and prediction function seems working ...")
         finalScore+=3
@@ -132,12 +132,12 @@ print("Now testing a little bit different training dataset ....")
 NRecord = generateTest(N,F,TestingData)
 
 try:
-    os.system("python "+ ProgramName + " --mode T --input "+TrainingData+" --output "+ModelPath)
+    os.system("python3 "+ ProgramName + " --mode T --input "+TrainingData+" --output "+ModelPath)
 except:
     print("error when running "+ProgramName)
 
 try:
-    os.system("python "+ ProgramName + " --mode P --input "+TestingData+" --modelPath "+ModelPath + " --output " + PredictionData)
+    os.system("python3 "+ ProgramName + " --mode P --input "+TestingData+" --modelPath "+ModelPath + " --output " + PredictionData)
     if verify(PredictionData,NRecord):
         print("Great! Your DT Training and prediction function seems working ...")
         finalScore+=3
@@ -156,12 +156,12 @@ deleteTemFile(PredictionData)
 NRecord = generateTest(N,F,TestingData)
 
 try:
-    os.system("python "+ ProgramName + " --mode T --input "+TrainingData+" --output "+ModelPath)
+    os.system("python3 "+ ProgramName + " --mode T --input "+TrainingData+" --output "+ModelPath)
 except:
     print("error when running "+ProgramName)
 
 try:
-    os.system("python "+ ProgramName + " --mode P --input "+TestingData+" --modelPath "+ModelPath + " --output " + PredictionData)
+    os.system("python3 "+ ProgramName + " --mode P --input "+TestingData+" --modelPath "+ModelPath + " --output " + PredictionData)
     if verify(PredictionData,NRecord):
         print("Great! Your DT Training and prediction function seems working ...")
         finalScore+=4
@@ -180,12 +180,12 @@ deleteTemFile(PredictionData)
 NRecord = generateTest(N,F,TestingData)
 
 try:
-    os.system("python "+ ProgramName + " --mode T --input "+TrainingData+" --output "+ModelPath)
+    os.system("python3 "+ ProgramName + " --mode T --input "+TrainingData+" --output "+ModelPath)
 except:
     print("error when running "+ProgramName)
 
 try:
-    os.system("python "+ ProgramName + " --mode P --input "+TestingData+" --modelPath "+ModelPath + " --output " + PredictionData)
+    os.system("python3 "+ ProgramName + " --mode P --input "+TestingData+" --modelPath "+ModelPath + " --output " + PredictionData)
     if verify(PredictionData,NRecord):
         print("Great! Your DT Training and prediction function seems working ...")
         finalScore+=4
