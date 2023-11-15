@@ -256,7 +256,7 @@ def DTtrain(infile, model, percent, entropy_option):
     t.save_model(model)
 
 
-class TreeNode:
+class TreeNodeP:
     def __init__(self, attribute, children, return_val):
         self.attribute = attribute
         self.children = children
@@ -271,6 +271,9 @@ class DTPredict:
 
     def read_model(self, infile):
 
+        print("PREDICTION METHOD REACHED")
+        print(infile)
+
         try:
             with open(infile, 'r') as file:
                 atts = file.readline().split()
@@ -283,37 +286,50 @@ class DTPredict:
                 self.root = self.read_node(file)
 
         except IOError as e:
-            print('Error reading file: ' + e)
+            print('Error reading file: ', e)
             sys.exit(1)
 
     def read_node(self, file):
+        n_generator = self.read_next_word(file)
+        n = next(n_generator)
+        print("VALUE OF N: ", n)
 
-        line = file.readline().strip()
+        if n[0] == '[':
+            return TreeNodeP(None, None, n[1:-1])
         
-        if not line:
-            return None 
+        node = TreeNodeP(n, {}, None)
+        next(n_generator)
+        
+        val = next(n_generator)
+        print("VAL BEFORE WHILE: ", val)
 
-        tree = line.split()
-        n = tree[0][0]
-
-        if n == "[":
-            return TreeNode(None, None, tree[1][:-1])
-
-        node = TreeNode(n, {}, None)
-
-        i = 1
-        while i < len(tree):
-            val = tree[i]
-
-            print("this is a val", val)
-            
-            if val == ")":
-                return node
-
+        while val != ')':
+            print("VAL IN WHILE LOOP: ", val)
             node.children[val] = self.read_node(file)
-            i += 1
+            val = next(n_generator)
 
         return node
+
+    def read_next_word(self, file):
+
+        word = ''
+        current_position = file.tell()
+
+        while True:
+            char = file.read(1)
+            # print("VALUE OF CHAR IN READ: ", char)
+            if not char:  # End of file
+                if word:
+                    yield word
+                break
+            if char.isspace():
+                if word:
+                    yield word
+                    word = ''
+            else:
+                word += char
+        
+        file.seek(current_position) 
 
     def predict_from_model(self, testfile):
 
@@ -326,13 +342,13 @@ class DTPredict:
 
                     if data:
                         data.pop(0)
-                        print(self.root)
                         pred = self.trace_tree(self.root, data)
                         self.predictions.append(pred)
 
         except IOError as e:
             print(f"Error reading test file: {e}")
             sys.exit(1)
+            
 
     def trace_tree(self, node, data):
 
@@ -405,17 +421,8 @@ def main():
     options = parser.parse_args()
     inputFile = "TrainingData.txt"
     outModel = "DTModel.txt"
-<<<<<<< HEAD
-<<<<<<< HEAD
-    mode = "T"  # first get the mode
-    entropy_option = options.entropy
-=======
     mode = "P"  # first get the mode
->>>>>>> 632a53f (DTPredict Implementation)
-=======
-    mode = "T"  # first get the mode
     entropy_option = options.entropy
->>>>>>> 77d148e (Add Second Entropy Option for Bonus Points)
     print("mode is " + mode)
     if mode == "T":
         """
