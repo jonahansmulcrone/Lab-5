@@ -406,11 +406,16 @@ def main():
     inputFile = "TrainingData.txt"
     outModel = "DTModel.txt"
 <<<<<<< HEAD
+<<<<<<< HEAD
     mode = "T"  # first get the mode
     entropy_option = options.entropy
 =======
     mode = "P"  # first get the mode
 >>>>>>> 632a53f (DTPredict Implementation)
+=======
+    mode = "T"  # first get the mode
+    entropy_option = options.entropy
+>>>>>>> 77d148e (Add Second Entropy Option for Bonus Points)
     print("mode is " + mode)
     if mode == "T":
         """
